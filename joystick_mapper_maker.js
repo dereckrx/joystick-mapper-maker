@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const xbox360Mappings = {
+const xbox360ButtonToId = {
 	"left_trigger": "axi 2 +", 
 	"left_bumper": "btn 4",
 	"right_trigger": "axi 5 +",
@@ -33,7 +33,7 @@ const xbox360Mappings = {
 	"right_stick_click": "btn 7"
 }
 
-const mouseKeyboardMappings = {
+const mouseKeyboardInputToId = {
 "a": "key 4",
 "b": "key 5",
 "c": "key 6",
@@ -81,8 +81,8 @@ const mouseKeyboardMappings = {
 ";": "key 51",
 ":": "key 52",
 "`": "key 53",
-",": "key 54",
-".": "key 55",
+"comma": "key 54",
+"period": "key 55",
 "/": "key 56",
 // ---
 "right_arrow": "key 79",
@@ -185,202 +185,12 @@ const mouseKeyboardMappings = {
 "mouse_wheel_step_up": "whs 1 -" 
 }
 
-function inputToId(key) {
-	return mouseKeyboardMappings[key];
+function mouseKeyInputToId(input) {
+	return mouseKeyboardInputToId[input];
 }
 
-function cInputToId(key) {
-	return xbox360Mappings[key];
-}
-
-// TEST ---------------------------------------
-function is(actual, expected) {
-	return actual === expected ? "PASS" : `FAIL: expected '${actual}' to equal '${expected}'`;
-}
-
-const testCases = {
-	"a": "key 4",
-	"z": "key 29",
-	"1": "key 30",
-	"0": "key 39",
-	"-": "key 45",
-	"/": "key 56",
-	"right_arrow": "key 79",
-	"up_arrow": "key 82",
-	"left_command": "key 227",
-	"right_control": "key 228",
-	"space": "key 44",
-	"tab": "key 43",
-	"caps_lock": "key 57",
-}
-				
-Object.entries(testCases).map(([key, expected]) => {
-	console.log(`${is(inputToId(key), expected)} ${key}`);
-});
-
-// Mappings ------------------------------
-
-// Nice click and shift/control combo
-const tiggersBumpers = {
-	clicksAndMods: [
-		"right_trigger, left_click", 
-		"right_bumper, right_click",
-		"left_trigger, left_shift",
-		"left_bumper, left_control"
-	]
-}
-
-const leftStick = {
-	wsad: [
-		"left_stick_up, w",
-		"left_stick_down, s",
-		"left_stick_left, a",
-		"left_stick_right, d",
-	]
-}
-
-const rightStick = {
-	mouse: [
-		"right_stick_up, mouse_up",
-		"right_stick_down, mouse_down",
-		"right_stick_left, mouse_left",
-		"right_stick_right, mouse_right"
-	]
-}
-
-const dPad = {
-	hotbar: [
-		"d_pad_left, 1",
-		"d_pad_up, 2",
-		"d_pad_right, 3",
-		"d_pad_down, 4"
-	],
-	wsad: [
-		"d_pad_up, w",
-		"d_pad_down, s"
-		"d_pad_left, a",
-		"d_pad_right, d",
-	],
-	mouse: [
-		"d_pad_up, mouse_up",
-		"d_pad_down, mouse_down"
-		"d_pad_left, mouse_left",
-		"d_pad_right, mouse_right",
-	]
-}
-
-// Key/Mouse input, controller input, key_mouse
-const factorio = {
-	"name": "Factorio NEW NEW",
-	"mappings": [
-		...leftStick.wsad,
-		...rightStick.mouse,
-		...tiggersBumpers.clicksAndMods,
-		"left_stick_click, left_option, alt-mode",
-
-		// Buttons
-		"a, left_click",
-		"b, escape, 	toggle menu",
-		"x, f, 			pickup item",
-		"y, e, 			open character screen",
-		
-		// d-pad
-		"d_pad_up,    space, shoot enemy",
-		"d_pad_down,  z,     drop item",
-		"d_pad_left,  tab,   next weapon",
-		"d_pad_left,  q,     clear cursor",
-		"d_pad_right, r, 	 rotate",
-		
-		// start/select
-		"start,  m, world map",
-		"select, t, technology screen",
-
-		// others	
-		", c, 			     shoot selected",
-		", mouse_wheel_up, 	 zoom in",
-		", mouse_wheel_down, zoom out",
-		", x, rotate active quick bar"
-	]
-}
-
-// http://minecraft.gamepedia.com/Controls
-const minecraft = {
-	"name": "Minecraft 2019",
-	"mappings": [
-		...leftStick.wsad,
-		"left_stick_click, left_control, Sprint",
-
-		...rightStick.mouse,
-		"right_stick_click, left_click",
-
-		// Trigggers & Bumpers
-		"right_trigger, left_click, 		 attack/destroy",
-		"right_bumper,  right_click, 		 use/place block",
-		"left_trigger,  left_shift, 		 sneak",
-		"left_bumper,   mouse_wheel_step_up, cycle item",
-
-		// D-Pad
-		...dPad.hotbar,
-		// Buttons
-		"a, space, 		 jump",
-		"b, escape, 	 esc menu",
-		"x, right_click, use/craft",
-		"y, e, 			 inventory",
-		// Other
-		"start,  middle_click,  pick block",
-		"select, q, 			drop item"
-	]
-}
-
-const wow = {
-	// Wow Mapprings: 
-	// * Make ctl, alt, button on main action bar so you can cycle
-	// * 3 stacked actions bars: 1, 2, 3, ctls, options
-	// * Alt+(shit)tab (bumper) cycle action pages
-	// * ctl+(alt)+space: zoom in/out
-	// * Target Self	ctl + m
-	// * Target ally target: ctl+option+m
-	// Target Party	F2-F5 (maybe d-pad if mouse is around)
-	// middle_click, reset camera/run
-	"name": "Minecraft 2019",
-	"mappings": [
-		// ## Trig & Bumps: Mods and targets
-		// target enemy:	r-bumper (tab)
-		// target prev en:	l-bumper (shift+tab)
-		// target friend:	r-bumper+l-trigger (ctrl+tab)
-		// target prev friend:	l-bumper+l-trigger (ctrl+shfit+tab)
-		// Cycle hot-bars
-		// target self: l-trigger+start (control+m) 
-		"left_trigger, left_control",
-		"right_trigger, left_option",
-		"left_bumper, left_shift, prev target",
-		"left_bumper, tab",
-		"right_bumper, tab, cycle target",
-		// Left stick: 3rd person move
-		"left_stick_up, w",
-		"left_stick_down, s",
-		"left_stick_left, q, strafe left",
-		"left_stick_right, e, strafe left",
-		"left_stick_click, right_click",
-		// Buttons: Action bar + jump
-		"a, space, jump",
-		"b, 3",
-		"x, 1",
-		"y, 2",
-		// Center buttons
-		"start, m, map",
-		"select, escape",
-		// D-pad
-		...dPad.mouse,
-		// Right Stick: Camera 
-		"right_stick_up, right_click, pan up",
-		"right_stick_up, mouse_up",
-		"right_stick_down, right_click, pan down",
-		"right_stick_down, mouse_down",
-		"right_stick_left, a, camera look left",
-		"right_stick_right, d, camera look right", 
-		"right_stick_click, left_click"
-	]
+function buttonToId(button) {
+	return xbox360ButtonToId[button];
 }
 
 const template = {
@@ -410,10 +220,24 @@ function generate(data) {
 	const binds = {};
 	data.mappings.forEach((mapping) => {
 		const results = mapping.split(",").map((str) => str.trim());
-		const [cInput, kInput, desc] = results;
-		if(cInput != null && cInput !== "") {
-			console.log(`${cInput} ${cInputToId(cInput)} => [${kInput} ${inputToId(kInput)}]`);
-			binds[cInputToId(cInput)] = [inputToId(kInput)];
+		const [button, mouseKeyInput, desc] = results;
+		if(button != null && button !== "") {
+			const buttonId = buttonToId(button);
+			const keyId = mouseKeyInputToId(mouseKeyInput);
+			console.log(`${button} (${buttonId}) => ${mouseKeyInput} (${keyId}) = ${desc}`);
+			
+			if(!buttonId) {
+				throw `Unknown controller button '${button}'`;
+			}
+			
+			if(!keyId) {
+				throw `Unknown mouse/keyboard input '${mouseKeyInput}'`;
+			}
+			
+			if(!binds[buttonId]) {
+				binds[buttonId] = [];
+			}
+			binds[buttonId].push(keyId);
 		}
 	});
 	preset.joysticks[0].binds = binds;
@@ -421,7 +245,8 @@ function generate(data) {
 	save(`/Users/dereckrx/Library/Application Support/Joystick Mapper/presets/${data.name}.txt`, preset);
 }
 
-generate(factorio);
+const {preset} = require('./presets/liero');
+generate(preset);
 
 
 
